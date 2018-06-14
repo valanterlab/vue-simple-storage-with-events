@@ -183,37 +183,28 @@
 </template>
 
 <script>
-
 // var solc = require('solc')
 import Web3  from 'web3'
 import Tx from 'ethereumjs-tx'
 import Units from 'ethereumjs-units'
-
 let contractAbi = '[{"constant": false,"inputs": [{"name": "_x","type": "string"}],"name": "set","outputs": [],"payable": false,"stateMutability": "nonpayable","type": "function"},{"constant": true,"inputs": [],"name": "get","outputs": [{"name": "","type": "string"}],"payable": false,"stateMutability": "view","type": "function"},{"anonymous": false,"inputs": [{"indexed": false,"name": "storedData","type": "string"}],"name": "Notify","type": "event"}]'
 let contractBytecode = `0x6060604052341561000f57600080fd5b61037f8061001e6000396000f30060606040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680634ed3885e146100515780636d4ce63c146100ae575b600080fd5b341561005c57600080fd5b6100ac600480803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509190505061013c565b005b34156100b957600080fd5b6100c16101f2565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156101015780820151818401526020810190506100e6565b50505050905090810190601f16801561012e5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b806000908051906020019061015292919061029a565b507fc88633c9c082cd7ecb86718d986cac02aafc2ea7a3c91c69226d84f49bec62d1816040518080602001828103825283818151815260200191508051906020019080838360005b838110156101b557808201518184015260208101905061019a565b50505050905090810190601f1680156101e25780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b6101fa61031a565b60008054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156102905780601f1061026557610100808354040283529160200191610290565b820191906000526020600020905b81548152906001019060200180831161027357829003601f168201915b5050505050905090565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106102db57805160ff1916838001178555610309565b82800160010185558215610309579182015b828111156103085782518255916020019190600101906102ed565b5b509050610316919061032e565b5090565b602060405190810160405280600081525090565b61035091905b8082111561034c576000816000905550600101610334565b5090565b905600a165627a7a723058207f12c8232715f653dabdfaca467ed159d5affb992bef825fa43a7641a0d50a3c0029`
-
 let contractSource = `pragma solidity ^0.4.0;
-
 contract SimpleStorage {
     string storedData;
-
     event Notify(
        string storedData
     );
-
     function set(string _x) public {
         storedData = _x;
         Notify(_x);
     }
-
     function get() public constant returns (string) {
         return storedData;
     }
 }`
-
 export default {
   name: 'VueSimpleStorage',
-
   data () {
     return {
       title: 'VueSimpleStorage with Events',
@@ -255,7 +246,6 @@ export default {
   },
   created() {
     this.subscribeEvent()
-
     // Check balance
     if (this.address != '') {
       this.getBalance(this.address)
@@ -269,7 +259,6 @@ export default {
       // Get provider
       let url = this.nodeUrl
       web3.setProvider(this.nodeUrl)
-
       return web3
     },
     // Get balance
@@ -279,7 +268,6 @@ export default {
       if (web3.utils.isAddress(address)) {
         // Dial node
         web3 = this.dialNode()
-
         // Get balance
         let self = this
         web3.eth.getBalance(address)
@@ -295,31 +283,24 @@ export default {
     },
     createAccount() {
       console.log('Create account')
-
       // Dial node
       let web3 = this.dialNode()
-
       // Create account
       let account = web3.eth.accounts.create();
       console.log(account)
-
       // Set account info
       this.address = account.address
       this.privateKey = account.privateKey
-
       // Get balance
       this.getBalance(account.address)
     },
     // Deploy contract
     deployContract() {
       console.log('Deploy contract on node: ' + this.nodeUrl + ', for address: ' + this.address)
-
       // Dial node
       let web3 = this.dialNode()
-
       // Get keys
       var privateKey = new Buffer(this.privateKey, 'hex')
-
       var abi = JSON.parse(contractAbi)
       // Exec contract
       var contract = new web3.eth.Contract(abi);
@@ -330,12 +311,10 @@ export default {
       console.log('Contract: ', contract);
       // Get payload
       var payload = contractDeploy.encodeABI();
-
       // Save current this
       let self = this
       self.deploying = true
       self.contractAddress = ''
-
       // Estimate gas price
       web3.eth.getGasPrice(function(gasPriceError, result) {
         if (gasPriceError) {
@@ -346,7 +325,6 @@ export default {
           var gasPrice = result;
           console.log('Get GasPrice success: ', gasPrice)
           var gasPriceHex = web3.utils.numberToHex(gasPrice)
-
           // Get nonce
           web3.eth.getTransactionCount(self.address, function(nonceError, nonce) {
             if (nonceError) {
@@ -358,10 +336,8 @@ export default {
               // Get the current nonce
               const nonceHex = web3.utils.numberToHex(nonce)
               console.log("Nonce hex : ", nonce)
-
               // Set the gas limit
               const gasLimitHex = web3.utils.numberToHex(300000)
-
               // Create transaction
               const rawTx = {
                 nonce: nonceHex,
@@ -372,14 +348,12 @@ export default {
                 data: payload
               }
               console.log("Raw Transaction: ",rawTx)
-
               // Sign and serialize the transaction
               console.log("Sign raw transaction with privatekey: ", privateKey)
               const tx = new Tx(rawTx)
               tx.sign(privateKey)
               const serializedTx = tx.serialize();
               console.log("Raw transaction ready to be sent: ", "0x" + serializedTx.toString('hex'))
-
               // Send signed transaction
               web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
                 .on('error', function(error){
@@ -410,22 +384,17 @@ export default {
     // Set storage value
     setValue() {
       console.log('Set value:' + this.storageValue + ' to contract: ' + this.contractAddress + ' on node: ' + this.nodeUrl)
-
       // Dial node
       let web3 = this.dialNode()
-
       // Get keys
       var privateKey = new Buffer(this.privateKey, 'hex')
-
       var abi = JSON.parse(contractAbi)
       // Exec contract
       var contract = new web3.eth.Contract(abi, this.contractAddress)
       console.log('Contract: ', contract);
-
       // Save current this
       let self = this
       self.executing = true
-
       // Estimate gas price
       web3.eth.getGasPrice(function(gasPriceError, result) {
         if (gasPriceError) {
@@ -436,7 +405,6 @@ export default {
           var gasPrice = result;
           console.log('Get GasPrice success: ', gasPrice)
           var gasPriceHex = web3.utils.numberToHex(gasPrice)
-
           // Get nonce
           web3.eth.getTransactionCount(self.address, function(nonceError, nonce) {
             if (nonceError) {
@@ -448,18 +416,14 @@ export default {
               // Get the current nonce
               const nonceHex = web3.utils.numberToHex(nonce)
               console.log("Nonce hex : ", nonce)
-
               // Execute the smart contract method
               var newValue = self.storageValue
               var contractCallData = contract.methods.set(newValue)
               console.log('contractCallData : ', contractCallData)
-
               // Get payload
               var payload = contractCallData.encodeABI()
-
               // Set the gas limit
               const gasLimitHex = web3.utils.numberToHex(3000000)
-
               // Create transaction
               const rawTx = {
                 nonce: nonceHex,
@@ -471,14 +435,12 @@ export default {
                 data: payload
               }
               console.log("Raw Transaction: ",rawTx)
-
               // Sign and serialize the transaction
               console.log("Sign raw transaction with privatekey: ", privateKey)
               const tx = new Tx(rawTx)
               tx.sign(privateKey)
               const serializedTx = tx.serialize();
               console.log("Raw transaction ready to be sent: ", "0x" + serializedTx.toString('hex'))
-
               // Send signed transaction
               web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
                 .on('error', function(error){
@@ -509,10 +471,8 @@ export default {
         console.log('Subscribe event:', this.contractAddress);
         // Dial node
         let web3 = this.dialNode()
-
         var abi = JSON.parse(contractAbi)
         var contract = new web3.eth.Contract(abi, this.contractAddress)
-
         // Catch event
         let self = this
         contract.events.Notify( {},
@@ -534,9 +494,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 h1, h2 {
   font-weight: normal;
 }
-
 </style>

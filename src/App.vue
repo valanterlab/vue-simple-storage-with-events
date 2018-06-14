@@ -7,7 +7,6 @@
 
 <script>
 import SimpleStorage from './components/SimpleStorage'
-
 export default {
   name: 'App',
   components: {
